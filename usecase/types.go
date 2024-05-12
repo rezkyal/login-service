@@ -38,6 +38,5 @@ type UpdateUserDataInput struct {
 }
 
 type UpdateUserDataOutput struct {
-	Id                  int64
 	IsPhoneNumberExists bool
 }

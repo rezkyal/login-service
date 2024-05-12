@@ -27,7 +27,6 @@ type UpdateUserDataInput struct {
 }
 
 type UpdateUserDataOutput struct {
-	Id                  int64
 	IsPhoneNumberExists bool
 }
 
@@ -51,6 +50,6 @@ type GetUserDataByIdOutput struct {
 	PhoneNumber string
 }
 
-type UpdateTotalLoginByIDInput struct {
+type UpdateTotalLoginByIdInput struct {
 	Id int64
 }

@@ -31,8 +31,7 @@ func newServer() *handler.Server {
 	})
 
 	opts := handler.NewServerOptions{
-		Repository: repo,
-		Usecase:    usecase,
+		Usecase: usecase,
 	}
 
 	return handler.NewServer(opts)

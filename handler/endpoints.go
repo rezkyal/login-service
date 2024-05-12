@@ -1,7 +1,6 @@
 package handler
 
 import (
-	"fmt"
 	"log"
 	"net/http"
 	"strconv"
@@ -11,14 +10,6 @@ import (
 	"github.com/SawitProRecruitment/UserService/utils"
 	"github.com/labstack/echo/v4"
 )
-
-// This is just a test endpoint to get you started. Please delete this endpoint.
-// (GET /hello)
-func (s *Server) Hello(ctx echo.Context, params generated.HelloParams) error {
-	var resp generated.HelloResponse
-	resp.Message = fmt.Sprintf("Hello User %d", params.Id)
-	return ctx.JSON(http.StatusOK, resp)
-}
 
 // This endpoint is used to register a new user
 // (POST /registration)
@@ -127,7 +118,7 @@ func (s *Server) Login(ctx echo.Context) error {
 // (GET /profile)
 func (s *Server) ProfileGet(ctx echo.Context) error {
 
-	id, err := utils.TokenValid(ctx)
+	id, err := utils.TokenValidity(ctx)
 
 	if err != nil {
 		return ctx.JSON(http.StatusForbidden, generated.BasicErrorResponse{
@@ -156,11 +147,11 @@ func (s *Server) ProfileGet(ctx echo.Context) error {
 // (PUT /profile)
 func (s *Server) ProfileUpdate(ctx echo.Context) error {
 
-	id, err := utils.TokenValid(ctx)
+	id, err := utils.TokenValidity(ctx)
 
 	if err != nil {
 		return ctx.JSON(http.StatusForbidden, generated.BasicErrorResponse{
-			Message: "Forbiddenn",
+			Message: "Forbidden",
 		})
 	}
 
@@ -171,14 +162,18 @@ func (s *Server) ProfileUpdate(ctx echo.Context) error {
 
 	ctx.Bind(&req)
 
-	errValidation := utils.ValidateFullName(req.FullName)
-	if errValidation != nil {
-		errs[FULLNAME_FIELD] = errValidation
+	if req.FullName != "" {
+		errValidation := utils.ValidateFullName(req.FullName)
+		if errValidation != nil {
+			errs[FULLNAME_FIELD] = errValidation
+		}
 	}
 
-	errValidation = utils.ValidatePhoneNumbers(req.PhoneNumber)
-	if errValidation != nil {
-		errs[PHONE_NUMBER_FIELD] = errValidation
+	if req.PhoneNumber != "" {
+		errValidation := utils.ValidatePhoneNumbers(req.PhoneNumber)
+		if errValidation != nil {
+			errs[PHONE_NUMBER_FIELD] = errValidation
+		}
 	}
 
 	if len(errs) != 0 {

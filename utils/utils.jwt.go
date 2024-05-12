@@ -13,13 +13,23 @@ import (
 	"github.com/pkg/errors"
 )
 
+var (
+	KeyDataPrivate, KeyDataPublic []byte
+)
+
 func GenerateToken(id int64) (string, error) {
-	keyData, err := os.ReadFile("./rsakey/jwtrsa256.key")
-	if err != nil {
-		log.Println("[ERROR][GenerateToken] failed to read private key", err)
-		return "", errors.WithStack(errors.New("Error when generate token"))
+	var (
+		err error
+	)
+
+	if len(KeyDataPrivate) == 0 {
+		KeyDataPrivate, err = os.ReadFile("rsakey/jwtrsa256.key")
+		if err != nil {
+			log.Println("[ERROR][GenerateToken] failed to read private key", err)
+			return "", errors.WithStack(errors.New("Error when read private key"))
+		}
 	}
-	key, err := jwt.ParseRSAPrivateKeyFromPEM(keyData)
+	key, err := jwt.ParseRSAPrivateKeyFromPEM(KeyDataPrivate)
 	if err != nil {
 		log.Println("[ERROR][GenerateToken] failed to parse rsa private key from PEM", err)
 		return "", errors.WithStack(errors.New("Error when generate token"))
@@ -48,10 +58,31 @@ func GenerateToken(id int64) (string, error) {
 	return tokenString, nil
 }
 
-func TokenValid(ctx echo.Context) (int64, error) {
-	keyData, _ := os.ReadFile("rsakey/jwtrsa256.key.pub")
-	key, _ := jwt.ParseRSAPublicKeyFromPEM(keyData)
+func TokenValidity(ctx echo.Context) (int64, error) {
+
 	tokenString := ExtractToken(ctx)
+
+	return TokenParse(tokenString)
+}
+
+func TokenParse(tokenString string) (int64, error) {
+	var (
+		err error
+	)
+	if len(KeyDataPublic) == 0 {
+		KeyDataPublic, err = os.ReadFile("rsakey/jwtrsa256.key.pub")
+		if err != nil {
+			log.Println("[ERROR][TokenValid] failed to read public key", err)
+			return 0, errors.WithStack(errors.New("Error when read public key"))
+		}
+	}
+
+	key, err := jwt.ParseRSAPublicKeyFromPEM(KeyDataPublic)
+	if err != nil {
+		log.Println("[ERROR][TokenValid] failed to parse rsa public key from PEM", err)
+		return 0, errors.WithStack(errors.New("Error when generate token"))
+	}
+
 	token, err := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
 		if _, ok := token.Method.(*jwt.SigningMethodRSA); !ok {
 			return nil, fmt.Errorf("unexpected signing method: %v", token.Header["alg"])

@@ -25,7 +25,7 @@ func ValidatePhoneNumbers(s string) error {
 	)
 
 	if totalChar < 10 || totalChar > 13 {
-		err = append(err, "must be minimum 10 characters and maximum 13 characters")
+		err = append(err, "must be at minimum 10 characters and maximum 13 characters")
 	}
 
 	if totalChar > 2 && !(s[0] == '+' && s[1] == '6' && s[2] == '2') {
@@ -59,7 +59,7 @@ func ValidatePassword(s string) error {
 	}
 
 	if totalChar < 6 || totalChar > 64 {
-		err = append(err, "must be minimum 6 characters and maximum 64 characters")
+		err = append(err, "must be at minimum 6 characters and maximum 64 characters")
 	}
 
 	if !(number && capital && special) {

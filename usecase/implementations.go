@@ -87,7 +87,7 @@ func (u *Usecase) Login(ctx context.Context, input LoginInput) (LoginOutput, err
 	}
 
 	go func(id int64) {
-		err := u.Repository.UpdateTotalLoginById(context.Background(), repository.UpdateTotalLoginByIDInput{
+		err := u.Repository.UpdateTotalLoginById(context.Background(), repository.UpdateTotalLoginByIdInput{
 			Id: id,
 		})
 
@@ -135,8 +135,8 @@ func (u *Usecase) UpdateUserData(ctx context.Context, input UpdateUserDataInput)
 
 	outputRepo, err := u.Repository.UpdateUserData(ctx, repository.UpdateUserDataInput{
 		Id:          input.Id,
-		PhoneNumber: input.PhoneNumber,
-		FullName:    input.FullName,
+		PhoneNumber: userData.PhoneNumber,
+		FullName:    userData.FullName,
 	})
 
 	if err != nil {
@@ -144,7 +144,6 @@ func (u *Usecase) UpdateUserData(ctx context.Context, input UpdateUserDataInput)
 	}
 
 	return UpdateUserDataOutput{
-		Id:                  outputRepo.Id,
 		IsPhoneNumberExists: outputRepo.IsPhoneNumberExists,
 	}, nil
 }
