@@ -5,6 +5,8 @@ services:
       - "8080:1323"
     environment:
       DATABASE_URL: postgres://postgres:postgres@db:5432/database?sslmode=disable
+      JWT_LIVESPAN: 120
+      BCRYPT_COST: 5
     depends_on:
       db:
         condition: service_healthy

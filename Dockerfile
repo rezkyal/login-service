@@ -16,6 +16,10 @@ FROM alpine:latest
 # We need to copy the binary from the build image to the production image.
 COPY --from=Build /main .
 
+RUN mkdir /rsakey
+
+COPY rsakey rsakey
+
 # This is the port that our application will be listening on.
 EXPOSE 1323
 

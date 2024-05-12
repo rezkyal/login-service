@@ -10,8 +10,21 @@
 /** This is test table. Remove this table and replace with your own tables. */
 CREATE TABLE test (
 	id serial PRIMARY KEY,
-	name VARCHAR ( 50 ) UNIQUE NOT NULL,
+	name VARCHAR ( 50 ) UNIQUE NOT NULL
 );
 
 INSERT INTO test (name) VALUES ('test1');
 INSERT INTO test (name) VALUES ('test2');
+
+CREATE TABLE users (
+  id serial primary key,
+  phone_number VARCHAR(13) UNIQUE NOT NULL,
+  full_name VARCHAR(60) NOT NULL,
+  password VARCHAR(256) NOT NULL,
+  total_login int not null default 0,
+  created_at timestamptz default now(),
+  updated_at timestamptz,
+  updated_by int
+);
+
+create index user_phone_number on users using hash(phone_number);
