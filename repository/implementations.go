@@ -29,6 +29,7 @@ func (r *Repository) InsertNewUser(ctx context.Context, input InsertNewUserInput
 }
 
 func (r *Repository) UpdateUserData(ctx context.Context, input UpdateUserDataInput) (UpdateUserDataOutput, error) {
+	// TODO: add redis here
 	_, err := r.Db.ExecContext(ctx, UpdateUserDataQuery, input.Id, input.PhoneNumber, input.FullName, input.Id)
 	if err != nil {
 		if pgerr, ok := err.(*pq.Error); ok && pgerr.Code == KEY_CONFLICT {
@@ -54,6 +55,7 @@ func (r *Repository) UpdateTotalLoginById(ctx context.Context, input UpdateTotal
 }
 
 func (r *Repository) GetUserDataById(ctx context.Context, input GetUserDataByIdInput) (output GetUserDataByIdOutput, err error) {
+	// TODO: add redis here
 	err = r.Db.QueryRowContext(ctx, GetUserDataByIdQuery, input.Id).Scan(&output.Id, &output.FullName, &output.PhoneNumber)
 	err = errors.WithStack(err)
 	return

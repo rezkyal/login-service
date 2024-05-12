@@ -1,8 +1,3 @@
-generate rsa key https://gist.github.com/ygotthilf/baa58da5c3dd1f69fae9
-
-wrap errors
-
 improvement:
-- implement redis
-- wrap errors
-- implement message broker
+- implement redis for GetUserDataById function
+- implement message broker for handling UpdateTotalLoginById

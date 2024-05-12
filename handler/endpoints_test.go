@@ -8,6 +8,7 @@ import (
 	"net/http/httptest"
 	"net/url"
 	"os"
+	"sort"
 	"strings"
 	"testing"
 
@@ -59,6 +60,10 @@ func TestServer_Registration(t *testing.T) {
 			respFunc: func(rec *httptest.ResponseRecorder) interface{} {
 				var resp generated.ValidationErrorsResponse
 				json.Unmarshal(rec.Body.Bytes(), &resp)
+
+				sort.Slice(resp, func(i, j int) bool {
+					return resp[i].Field < resp[j].Field
+				})
 
 				return resp
 			},
@@ -217,6 +222,13 @@ func TestServer_Registration(t *testing.T) {
 			assert.Equal(t, tt.wantCode, rec.Code)
 
 			resp := tt.respFunc(rec)
+
+			if respRaw, ok := resp.(generated.ValidationErrorsResponse); ok {
+				sort.Slice(respRaw, func(i, j int) bool {
+					return respRaw[i].Field < respRaw[j].Field
+				})
+			}
+
 			assert.Equal(t, tt.wantResp, resp)
 		})
 	}
@@ -792,6 +804,13 @@ func TestServer_ProfileUpdate(t *testing.T) {
 			assert.Equal(t, tt.wantCode, rec.Code)
 
 			resp := tt.respFunc(rec)
+
+			if respRaw, ok := resp.(generated.ValidationErrorsResponse); ok {
+				sort.Slice(respRaw, func(i, j int) bool {
+					return respRaw[i].Field < respRaw[j].Field
+				})
+			}
+
 			assert.Equal(t, tt.wantResp, resp)
 		})
 	}

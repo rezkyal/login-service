@@ -86,6 +86,7 @@ func (u *Usecase) Login(ctx context.Context, input LoginInput) (LoginOutput, err
 		return LoginOutput{}, errors.WithStack(err)
 	}
 
+	// TODO: use message broker here
 	go func(id int64) {
 		err := u.Repository.UpdateTotalLoginById(context.Background(), repository.UpdateTotalLoginByIdInput{
 			Id: id,
