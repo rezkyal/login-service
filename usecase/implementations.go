@@ -3,13 +3,13 @@ package usecase
 import (
 	"context"
 	"database/sql"
-	"fmt"
 	"log"
 	"os"
 	"strconv"
 
 	"github.com/SawitProRecruitment/UserService/repository"
 	"github.com/SawitProRecruitment/UserService/utils"
+	"github.com/pkg/errors"
 	"golang.org/x/crypto/bcrypt"
 )
 
@@ -29,7 +29,7 @@ func (u *Usecase) RegisterNewUser(ctx context.Context, input RegisterNewUserInpu
 
 	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(input.Password), hashCost)
 	if err != nil {
-		return RegisterNewUserOutput{}, fmt.Errorf("[RegisterNewUser] error when hash password, err: %+v", err)
+		return RegisterNewUserOutput{}, errors.WithStack(err)
 	}
 
 	output, err := u.Repository.InsertNewUser(ctx, repository.InsertNewUserInput{
@@ -39,7 +39,7 @@ func (u *Usecase) RegisterNewUser(ctx context.Context, input RegisterNewUserInpu
 	})
 
 	if err != nil {
-		return RegisterNewUserOutput{}, fmt.Errorf("[RegisterNewUser] error when InsertNewUser %+v", err)
+		return RegisterNewUserOutput{}, errors.WithStack(err)
 	}
 
 	if output.IsPhoneNumberExists {
@@ -65,7 +65,7 @@ func (u *Usecase) Login(ctx context.Context, input LoginInput) (LoginOutput, err
 			}, nil
 		}
 
-		return LoginOutput{}, err
+		return LoginOutput{}, errors.WithStack(err)
 	}
 
 	err = bcrypt.CompareHashAndPassword([]byte(passwordRes.Password), []byte(input.Password))
@@ -77,13 +77,13 @@ func (u *Usecase) Login(ctx context.Context, input LoginInput) (LoginOutput, err
 			}, nil
 		}
 
-		return LoginOutput{}, err
+		return LoginOutput{}, errors.WithStack(err)
 	}
 
 	jwtToken, err := utils.GenerateToken(passwordRes.Id)
 
 	if err != nil {
-		return LoginOutput{}, err
+		return LoginOutput{}, errors.WithStack(err)
 	}
 
 	go func(id int64) {
@@ -92,7 +92,7 @@ func (u *Usecase) Login(ctx context.Context, input LoginInput) (LoginOutput, err
 		})
 
 		if err != nil {
-			log.Println("[ERROR][Login] error when UpdateTotalLoginById", err)
+			log.Println("[ERROR][Login] error when UpdateTotalLoginById", errors.WithStack(err))
 		}
 	}(passwordRes.Id)
 
@@ -107,7 +107,7 @@ func (u *Usecase) GetUserData(ctx context.Context, input GetUserDataInput) (GetU
 	})
 
 	if err != nil {
-		return GetUserDataOutput{}, err
+		return GetUserDataOutput{}, errors.WithStack(err)
 	}
 
 	return GetUserDataOutput{
@@ -140,7 +140,7 @@ func (u *Usecase) UpdateUserData(ctx context.Context, input UpdateUserDataInput)
 	})
 
 	if err != nil {
-		return UpdateUserDataOutput{}, err
+		return UpdateUserDataOutput{}, errors.WithStack(err)
 	}
 
 	return UpdateUserDataOutput{

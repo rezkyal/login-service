@@ -1,7 +1,6 @@
 package utils
 
 import (
-	"errors"
 	"fmt"
 	"log"
 	"os"
@@ -11,24 +10,25 @@ import (
 
 	"github.com/golang-jwt/jwt/v5"
 	"github.com/labstack/echo/v4"
+	"github.com/pkg/errors"
 )
 
 func GenerateToken(id int64) (string, error) {
 	keyData, err := os.ReadFile("./rsakey/jwtrsa256.key")
 	if err != nil {
 		log.Println("[ERROR][GenerateToken] failed to read private key", err)
-		return "", errors.New("Error when generate token")
+		return "", errors.WithStack(errors.New("Error when generate token"))
 	}
 	key, err := jwt.ParseRSAPrivateKeyFromPEM(keyData)
 	if err != nil {
 		log.Println("[ERROR][GenerateToken] failed to parse rsa private key from PEM", err)
-		return "", errors.New("Error when generate token")
+		return "", errors.WithStack(errors.New("Error when generate token"))
 	}
 
 	tokenLifespanStr := os.Getenv("JWT_LIVESPAN")
 	tokenLifespan, err := strconv.Atoi(tokenLifespanStr)
 	if err != nil {
-		log.Println("[WARN][GenerateToken] error when converting tokenLifespan", err)
+		log.Println("[WARN][GenerateToken] error when converting tokenLifespan", errors.WithStack(err))
 	}
 	if tokenLifespan == 0 {
 		tokenLifespan = 60
@@ -42,7 +42,7 @@ func GenerateToken(id int64) (string, error) {
 	tokenString, err := token.SignedString(key)
 
 	if err != nil {
-		return "", fmt.Errorf("[GenerateToken] error when SignedString, err: %+v", err)
+		return "", fmt.Errorf("[GenerateToken] error when SignedString, err: %+v", errors.WithStack(err))
 	}
 
 	return tokenString, nil
@@ -59,7 +59,7 @@ func TokenValid(ctx echo.Context) (int64, error) {
 		return key, nil
 	})
 	if err != nil {
-		return 0, err
+		return 0, errors.WithStack(err)
 	}
 
 	claims := token.Claims.(jwt.MapClaims)

@@ -4,11 +4,13 @@ import (
 	"context"
 
 	"github.com/lib/pq"
+	"github.com/pkg/errors"
 )
 
 func (r *Repository) GetTestById(ctx context.Context, input GetTestByIdInput) (output GetTestByIdOutput, err error) {
 	err = r.Db.QueryRowContext(ctx, "SELECT full_name FROM test WHERE id = $1", input.Id).Scan(&output.FullName)
 	if err != nil {
+		err = errors.WithStack(err)
 		return
 	}
 	return
@@ -27,7 +29,7 @@ func (r *Repository) InsertNewUser(ctx context.Context, input InsertNewUserInput
 				IsPhoneNumberExists: true,
 			}, nil
 		}
-		return output, err
+		return output, errors.WithStack(err)
 	}
 
 	output.Id = newId
@@ -47,11 +49,12 @@ func (r *Repository) UpdateUserData(ctx context.Context, input UpdateUserDataInp
 			}, nil
 		}
 	}
-	return UpdateUserDataOutput{}, err
+	return UpdateUserDataOutput{}, errors.WithStack(err)
 }
 
 func (r *Repository) GetPasswordByPhoneNumber(ctx context.Context, input GetPasswordByPhoneNumberInput) (output GetPasswordByPhoneNumberOutput, err error) {
 	err = r.Db.QueryRowContext(ctx, "SELECT id, password, phone_number FROM users WHERE phone_number = $1", input.PhoneNumber).Scan(&output.Id, &output.Password, &output.PhoneNumber)
+	err = errors.WithStack(err)
 	return
 }
 
@@ -60,10 +63,12 @@ func (r *Repository) UpdateTotalLoginById(ctx context.Context, input UpdateTotal
 		SET total_login = total_login + 1
 		WHERE id = $1`, input.Id)
 
+	errors.WithStack(err)
 	return err
 }
 
 func (r *Repository) GetUserDataById(ctx context.Context, input GetUserDataByIdInput) (output GetUserDataByIdOutput, err error) {
 	err = r.Db.QueryRowContext(ctx, "SELECT id, full_name, phone_number FROM users WHERE id = $1", input.Id).Scan(&output.Id, &output.FullName, &output.PhoneNumber)
+	errors.WithStack(err)
 	return
 }
