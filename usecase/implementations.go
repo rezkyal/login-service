@@ -59,7 +59,7 @@ func (u *Usecase) Login(ctx context.Context, input LoginInput) (LoginOutput, err
 	})
 
 	if err != nil {
-		if err == sql.ErrNoRows {
+		if errors.Is(err, sql.ErrNoRows) {
 			return LoginOutput{
 				IsDataNotFound: true,
 			}, nil

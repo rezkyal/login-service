@@ -13,7 +13,7 @@ var (
 	GetPasswordByPhoneNumberQuery = `SELECT id, password, phone_number FROM users WHERE phone_number = $1`
 
 	UpdateTotalLoginById = `UPDATE users
-	SET total_login = total_login + 1,
+	SET total_login = total_login + 1
 	WHERE id = $1`
 
 	GetUserDataByIdQuery = `SELECT id, full_name, phone_number FROM users WHERE id = $1`
